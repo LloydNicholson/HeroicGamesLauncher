@@ -73,11 +73,16 @@ export default function WineSelector({
   ])
 
   useEffect(() => {
-    if (wineVersion) return
+    if (wineVersion || !globalConfig) return
 
-    const firstAvailableVersion = wineVersionList.at(0)
-    if (firstAvailableVersion) setWineVersion(firstAvailableVersion)
-  }, [wineVersion, wineVersionList, setWineVersion])
+    // Prefer the default Wine version from the global settings, falling back
+    // to the first available one if it's not installed anymore
+    const defaultVersion = wineVersionList.find(
+      (version) => version.bin === globalConfig.wineVersion.bin
+    )
+    const versionToSelect = defaultVersion ?? wineVersionList.at(0)
+    if (versionToSelect) setWineVersion(versionToSelect)
+  }, [wineVersion, wineVersionList, setWineVersion, globalConfig])
 
   const showPrefix = wineVersion?.type !== 'crossover'
   const showBottle = wineVersion?.type === 'crossover'
